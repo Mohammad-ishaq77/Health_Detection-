@@ -16,12 +16,23 @@ def _load_models():
             _model_cache["columns"]
         )
 
+    print("========== DISEASE MODEL DEBUG ==========")
     print("MODEL PATH:", MODEL_PATH)
+    print("ENCODER PATH:", ENCODER_PATH)
+    print("COLUMNS PATH:", COLUMNS_PATH)
+
     print("MODEL EXISTS:", os.path.exists(MODEL_PATH))
+    print("ENCODER EXISTS:", os.path.exists(ENCODER_PATH))
+    print("COLUMNS EXISTS:", os.path.exists(COLUMNS_PATH))
 
     model = joblib.load(MODEL_PATH)
     encoder = joblib.load(ENCODER_PATH)
     columns = joblib.load(COLUMNS_PATH)
+
+    print("MODEL LOADED SUCCESSFULLY")
+    print("ENCODER LOADED SUCCESSFULLY")
+    print("COLUMNS LOADED SUCCESSFULLY")
+    print("========================================")
 
     _model_cache["model"] = model
     _model_cache["encoder"] = encoder
@@ -31,9 +42,13 @@ def _load_models():
 
 
 def predict_disease(symptoms: list):
+    print("Received symptoms:", symptoms)
+
     model, encoder, columns = _load_models()
 
     valid_symptoms = [s for s in symptoms if s in columns]
+
+    print("Valid symptoms:", valid_symptoms)
 
     if not valid_symptoms:
         return {
@@ -48,7 +63,11 @@ def predict_disease(symptoms: list):
 
     input_array = np.array(input_data).reshape(1, -1)
 
+    print("Input shape:", input_array.shape)
+
     prediction = model.predict(input_array)[0]
+    print("Raw prediction:", prediction)
+
     disease = encoder.inverse_transform([prediction])[0]
 
     probs = model.predict_proba(input_array)[0]
